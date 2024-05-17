@@ -12,8 +12,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        name: Checkout Repository 😎
       - name: Setup Node
         uses: actions/setup-node@v3
+        # set up caching dependencies
+      - uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ~/.npm
+          key: npm-${{hashFiles('**/package-lock.json')}}
+
       - run: npm ci
       - run: npm test
 
@@ -24,5 +32,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup Node
         uses: actions/setup-node@v3
+        # set up caching dependencies
+      - uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ~/.npm
+          key: npm-${{hashFiles('**/package-lock.json')}}
       - run: npm ci
       - run: npm run build
