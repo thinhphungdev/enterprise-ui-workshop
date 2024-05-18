@@ -1,5 +1,6 @@
 import { render, screen } from 'test/utilities';
 import PackingList from '.';
+import userEvent from '@testing-library/user-event';
 
 it('renders the Packing List application', () => {
   render(<PackingList />);
@@ -10,19 +11,41 @@ it('has the correct title', async () => {
   screen.getByText('Packing List');
 });
 
-it.todo('has an input field for a new item', () => {});
+it('has an input field for a new item', () => {
+  render(<PackingList />);
+  screen.getByLabelText('New Item Name');
+});
 
-it.todo(
-  'has a "Add New Item" button that is disabled when the input is empty',
-  () => {},
-);
+it('has a "Add New Item" button that is disabled when the input is empty', () => {
+  render(<PackingList />);
+  const newItemInput = screen.getByLabelText('New Item Name');
+  const addNewItemBtn = screen.getByRole('button', { name: 'Add New Item' });
 
-it.todo(
-  'enables the "Add New Item" button when there is text in the input field',
-  async () => {},
-);
+  expect(newItemInput).toHaveValue('');
+  expect(addNewItemBtn).toBeDisabled();
+});
 
-it.todo(
-  'adds a new item to the unpacked item list when the clicking "Add New Item"',
-  async () => {},
-);
+it('enables the "Add New Item" button when there is text in the input field', async () => {
+  render(<PackingList />);
+  const newItemInput = screen.getByLabelText('New Item Name');
+  const addNewItemBtn = screen.getByRole('button', { name: 'Add New Item' });
+
+  const user = userEvent.setup();
+
+  await user.type(newItemInput, 'hihi');
+
+  expect(addNewItemBtn).toBeEnabled();
+});
+
+it('adds a new item to the unpacked item list when the clicking "Add New Item"', async () => {
+  render(<PackingList />);
+
+  const newItemInput = screen.getByLabelText('New Item Name');
+  const addNewItemBtn = screen.getByRole('button', { name: 'Add New Item' });
+  const user = userEvent.setup();
+
+  await user.type(newItemInput, 'Macbook Pro M3');
+  await user.click(addNewItemBtn);
+
+  expect(screen.getByLabelText('Macbook Pro M3')).not.toBeChecked();
+});
