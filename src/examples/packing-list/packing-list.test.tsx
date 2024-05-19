@@ -1,5 +1,5 @@
-import { render, screen } from 'test/utilities';
-import PackingList from '.';
+import { render, screen, waitFor } from 'test/utilities';
+import { PackingList } from '.';
 import userEvent from '@testing-library/user-event';
 
 it('renders the Packing List application', () => {
@@ -48,4 +48,21 @@ it('adds a new item to the unpacked item list when the clicking "Add New Item"',
   await user.click(addNewItemBtn);
 
   expect(screen.getByLabelText('Macbook Pro M3')).not.toBeChecked();
+});
+
+it('Remove an item', async () => {
+  render(<PackingList />);
+
+  const newItemInput = screen.getByLabelText('New Item Name');
+  const addNewItemBtn = screen.getByRole('button', { name: 'Add New Item' });
+  const user = userEvent.setup();
+
+  await user.type(newItemInput, 'Macbook Pro M3');
+  await user.click(addNewItemBtn);
+
+  const removeItem = screen.getByLabelText('Remove Macbook Pro M3');
+
+  await user.click(removeItem);
+
+  await waitFor(() => expect(removeItem).not.toBeInTheDocument());
 });
