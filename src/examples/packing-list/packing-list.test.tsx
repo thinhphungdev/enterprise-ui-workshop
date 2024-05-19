@@ -1,6 +1,24 @@
-import { render, screen, waitFor } from 'test/utilities';
+import {
+  RenderOptions,
+  render as _render,
+  screen,
+  waitFor,
+} from 'test/utilities';
 import { PackingList } from '.';
 import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
+import { createStore } from '../packing-list-revisited/store';
+import { PropsWithChildren } from 'react';
+
+function render(Component: React.ReactElement, options?: RenderOptions) {
+  const store = createStore();
+
+  const Wrapper = ({ children }: PropsWithChildren) => {
+    return <Provider store={store}>{children}</Provider>;
+  };
+
+  return _render(Component, { ...options, wrapper: Wrapper });
+}
 
 it('renders the Packing List application', () => {
   render(<PackingList />);
@@ -60,7 +78,7 @@ it('Remove an item', async () => {
   await user.type(newItemInput, 'Macbook Pro M3');
   await user.click(addNewItemBtn);
 
-  const removeItem = screen.getByLabelText('Remove Macbook Pro M3');
+  const removeItem = screen.getByLabelText(/remove/i);
 
   await user.click(removeItem);
 
