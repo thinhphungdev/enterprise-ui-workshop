@@ -39,3 +39,15 @@ jobs:
           key: npm-${{hashFiles('**/package-lock.json')}}
       - run: npm ci
       - run: npm run build
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - run: npm test -- --converage
+      - uses: actions/upload-artifact@v3
+        name: Active coverage report
+        with:
+          name: coverage-report
+          path: coverage
