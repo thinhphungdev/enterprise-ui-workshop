@@ -1,0 +1,62 @@
+name: Run Unit Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        name: The checkout actions repository 😎
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        # set up caching dependencies
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm test
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        # set up caching dependencies
+      - uses: actions/cache@v3
+        name: Looking for dependencies in Cache 🤔
+        id: npm-cache
+        with:
+          path: ~/.npm
+          key: npm-${{hashFiles('**/package-lock.json')}}
+      - run: npm ci
+      - run: npm run build
+
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        name: The checkout actions repository 😎
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        # set up caching dependencies
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm test -- -- coverage
+      - uses: actions/upload-artifact@v3
+        name: Archive coverage report
+        with:
+          name: coverage-report
+          path: coverage
